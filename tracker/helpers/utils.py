@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import List
 
 from rich.console import Console
 from rich.progress import (
@@ -91,3 +92,58 @@ def get_config_file_path() -> Path:
         raise FileNotFoundError(f"Config file not found at {config_file_path}")
 
     return Path(config_file_path)
+
+
+def get_network_logs_path(config_file: Path, network: str, task: str) -> Path:
+    """
+    Returns the path to the network logs directory.
+
+    Args:
+        config_file (Path): The path to the config file.
+        network (str): The name of the network.
+        task (str): The name of the task.
+
+    Returns:
+        str: The path to the network logs directory.]
+
+    Raises:
+        KeyError: If the key is not found in the config file.
+    """
+
+    config_params = config(config_file, "log-source-dir")
+
+    key = f"{network.lower()}_{task}_logs"
+    if key not in config_params:
+        raise KeyError(f"Key {key} not found in config file")
+
+    network_logs_path = config_params[key]
+
+    return Path(network_logs_path)
+
+
+def get_most_recent_file(files: List[str]) -> Path:
+    """
+    Returns the most recent file from a list of files.
+
+    The file's name, which contains the timestamp, is used to determine the most recent file.
+
+    Example:
+        >>> files = ["file1_1703230348.txt", "file2_1703040196.txt"]
+        >>> get_most_recent_file(files)
+        "file1_1703230348.txt"
+
+    Args:
+        files (List[str]): A list of files.
+
+    Returns:
+        str: The most recent file.
+    """
+
+    file_paths = [Path(file) for file in files]
+
+    # Sort the files by name
+    file_paths.sort()
+
+    most_recent_file = file_paths[-1]
+
+    return most_recent_file
