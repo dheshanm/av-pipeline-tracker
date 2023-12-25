@@ -106,3 +106,21 @@ def get_error(log: Path) -> Optional[str]:
         return "Pipeline Rejected"
 
     return None
+
+
+def get_logs(log: Path) -> str:
+    """
+    Parses the logs from a log file.
+
+    Args:
+        log (Path): The path to the log file.
+
+    Returns:
+        str: The logs.
+    """
+    with open(log, "r") as f:
+        lines = f.readlines()
+
+    logs = "".join(lines)
+
+    return logs
