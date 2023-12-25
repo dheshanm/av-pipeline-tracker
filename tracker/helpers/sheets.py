@@ -17,9 +17,11 @@ try:
 except ValueError:
     pass
 
-import gspread
 import logging
 import time
+from functools import lru_cache
+
+import gspread
 
 from tracker.helpers.config import config
 
@@ -93,6 +95,7 @@ def get_worksheet(config_file: Path, sheet_name: str) -> gspread.Worksheet:
     return worksheet
 
 
+@lru_cache()
 def get_row_idx(
     sheet: gspread.Worksheet, col: int, value: str, logger: logging.Logger
 ) -> int:
