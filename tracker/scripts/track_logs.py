@@ -51,6 +51,7 @@ class TaskResults:
         runtime: timedelta,
         status: str,
         last_run: datetime,
+        logs: str,
     ):
         self.task = task
         self.subtask = subtask
@@ -58,6 +59,7 @@ class TaskResults:
         self.runtime = runtime
         self.status = status
         self.last_run = last_run
+        self.logs = logs
 
 
 def log_to_sheet(
@@ -68,7 +70,9 @@ def log_to_sheet(
     for task_result in TaskResults:
         site_id = task_result.site_id
 
-        row_idx = sheets.get_row_idx(sheet=worksheet, col=1, value=site_id, logger=logger)
+        row_idx = sheets.get_row_idx(
+            sheet=worksheet, col=1, value=site_id, logger=logger
+        )
 
         if task == "offsite":
             sub_tasks_col_idx: Dict[str, int] = {
@@ -97,6 +101,14 @@ def log_to_sheet(
             value=task_result.status,
             logger=logger,
         )
+        sheets.update_note(
+            worksheet=worksheet,
+            row_idx=row_idx,
+            col_idx=status_col_idx,
+            note=task_result.logs,
+            logger=logger,
+        )
+
         sheets.update_cell(
             worksheet=worksheet,
             row_idx=row_idx,
@@ -168,6 +180,8 @@ def track_site_logs(config_file: Path, task: str, site_logs: Path) -> None:
             status = "No errors"
         # logger.debug(f"Status: {status}")
 
+        logs = parser.get_logs(log=recent_log_file)
+
         task_result = TaskResults(
             task=task,
             subtask=subtask,
@@ -175,6 +189,7 @@ def track_site_logs(config_file: Path, task: str, site_logs: Path) -> None:
             runtime=runtime,
             status=status,
             last_run=run_time,
+            logs=logs,
         )
 
         task_results.append(task_result)
