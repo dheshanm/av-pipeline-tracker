@@ -150,6 +150,27 @@ def update_cell(
     api_rate_limit(logger, _update_cell)()
 
 
+def read_cell(
+    worksheet: gspread.Worksheet, row_idx: int, col_idx: int, logger: logging.Logger
+) -> str:
+    """
+    Read the value of a cell in a worksheet.
+
+    Args:
+        worksheet (gspread.Worksheet): The worksheet to read from.
+        row_idx (int): The row index of the cell to read.
+        col_idx (int): The column index of the cell to read.
+
+    Returns:
+        str: The value of the cell.
+    """
+
+    def _read_cell():
+        return worksheet.cell(row_idx, col_idx).value
+
+    return api_rate_limit(logger, _read_cell)()
+
+
 def update_note(
     worksheet: gspread.Worksheet,
     row_idx: int,

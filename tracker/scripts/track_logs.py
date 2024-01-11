@@ -43,6 +43,19 @@ logging.basicConfig(**logargs)
 
 
 class TaskResults:
+    """
+    Represents the results of a task execution.
+
+    Attributes:
+        task (str): The name of the task. Eg: offsite, daily_journal.
+        subtask (str): The name of the subtask. Eg: audio_process, transcript_process, video_process.
+        site_id (str): The ID of the site.
+        runtime (timedelta): The duration of the task execution.
+        status (str): The status of the task execution.
+        last_run (datetime): The timestamp of the last run.
+        logs (str): The logs generated during the task execution. Added as a note to the Google Sheet.
+    """
+
     def __init__(
         self,
         task: str,
@@ -65,6 +78,17 @@ class TaskResults:
 def log_to_sheet(
     config_file: Path, network: str, TaskResults: List[TaskResults]
 ) -> None:
+    """
+    Logs the task results to a worksheet in Google Sheets.
+
+    Args:
+        config_file (Path): The path to the configuration file.
+        network (str): The network name.
+        TaskResults (List[TaskResults]): A list of TaskResults objects.
+
+    Returns:
+        None
+    """
     worksheet = sheets.get_worksheet(config_file=config_file, sheet_name=network)
 
     for task_result in TaskResults:
@@ -126,6 +150,16 @@ def log_to_sheet(
 
 
 def log_completion(config_file: Path, network: str) -> None:
+    """
+    Logs when the script was last run to the Google Sheet.
+
+    Args:
+        config_file (Path): The path to the configuration file.
+        network (str): The name of the network.
+
+    Returns:
+        None
+    """
     worksheet = sheets.get_worksheet(config_file=config_file, sheet_name=network)
 
     current_time = datetime.now()
@@ -143,6 +177,17 @@ def log_completion(config_file: Path, network: str) -> None:
 
 
 def track_site_logs(config_file: Path, task: str, site_logs: Path) -> None:
+    """
+    Track the logs for a specific task and site.
+
+    Args:
+        config_file (Path): The path to the configuration file.
+        task (str): The task to track logs for.
+        site_logs (Path): The path to the site logs directory.
+
+    Returns:
+        None
+    """
     logger.info(f"Tracking {task} logs for site: {site_logs.name}")
     site_id = site_logs.name[-2:]
 
