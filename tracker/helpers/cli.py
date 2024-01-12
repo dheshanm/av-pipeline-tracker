@@ -1,5 +1,4 @@
 import logging
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -110,7 +109,9 @@ def send_email(
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.DEBUG)
 
-    if shutil.which("mail") is None:
+    mail_binary = Path("/usr/bin/mail")
+
+    if not mail_binary.exists():
         logger.error("[red][u]mail[/u] binary not found.[/red]", extra={"markup": True})
         logger.warning(
             "[yellow]Skipping sending email.[/yellow]", extra={"markup": True}
@@ -130,13 +131,11 @@ def send_email(
             for attachment in attachments:
                 temp.write(str(attachment.name) + "\n")
         temp.write("\n")
-        temp.write(
-            f"Sent at: {datetime.now()} {datetime.now().astimezone().tzinfo}"
-        )
+        temp.write(f"Sent at: {datetime.now()} {datetime.now().astimezone().tzinfo}")
         temp.flush()
 
         command_array = [
-            "mail",
+            str(mail_binary),
             "-s",
             f"'{subject}'",  # wrap subject in quotes to avoid issues with special characters
         ]
